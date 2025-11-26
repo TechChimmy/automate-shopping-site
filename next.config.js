@@ -1,7 +1,5 @@
 const nextConfig = {
   output: 'standalone',
-  assetPrefix: '/retail',
-  basePath:'/retail',
   images: {
     unoptimized: true,
   },
