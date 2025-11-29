@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { useRouter, usePathname } from 'next/navigation'
+import Image from 'next/image'
 import { supabase } from '@/lib/supabaseClient'
 import { useUser } from '@/hooks/use-user'
 import { Button } from '@/components/ui/button'
@@ -66,7 +67,13 @@ export default function Navbar() {
           {/* Logo */}
           <Link href={user ? (userRole === 'admin' ? '/admin/dashboard' : '/products') : '/'}>
             <div id="navbar-logo" className="flex items-center space-x-2 hover:opacity-80 transition-opacity cursor-pointer">
-              <ShoppingBag className="h-7 w-7" />
+              <Image
+                src="/logo.svg"
+                alt="ShopSuite logo"
+                width={28}
+                height={28}
+                className="h-7 w-7 object-contain"
+              />
               <span className="text-2xl font-bold">ShopSuite</span>
             </div>
           </Link>
