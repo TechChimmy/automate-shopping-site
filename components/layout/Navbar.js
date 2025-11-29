@@ -68,7 +68,7 @@ export default function Navbar() {
           <Link href={user ? (userRole === 'admin' ? '/admin/dashboard' : '/products') : '/'}>
             <div id="navbar-logo" className="flex items-center space-x-2 hover:opacity-80 transition-opacity cursor-pointer">
               <Image
-                src="/logo.svg"
+                src="/logo.png"
                 alt="ShopSuite logo"
                 width={28}
                 height={28}
