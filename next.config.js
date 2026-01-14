@@ -1,4 +1,3 @@
-console.log('🔥 NEXT CONFIG LOADED — basePath = /retail')
 
 const nextConfig = {
   output: 'standalone',
