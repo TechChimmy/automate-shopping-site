@@ -42,7 +42,7 @@ export default function ProductDetailPage({ params }) {
 
       if (error) throw error
       setProduct(data)
-      
+
       // Fetch suggested products from same category
       const { data: suggested } = await supabase
         .from('products')
@@ -50,9 +50,9 @@ export default function ProductDetailPage({ params }) {
         .eq('category', data.category)
         .neq('id', params.id)
         .limit(4)
-      
+
       setSuggestedProducts(suggested || [])
-      
+
       // Fetch reviews
       const reviewRes = await fetch(`/api/reviews?product_id=${params.id}`)
       const reviewData = await reviewRes.json()
@@ -64,7 +64,7 @@ export default function ProductDetailPage({ params }) {
       setLoading(false)
     }
   }
-  
+
   const submitReview = async () => {
     if (!user) {
       toast.error('Please login to submit a review')
@@ -79,10 +79,10 @@ export default function ProductDetailPage({ params }) {
       toast.error('Please write a review')
       return
     }
-    
+
     setSubmittingReview(true)
     try {
-      const res = await fetch('/api/reviews', {
+      const res = await fetch(`/api/reviews`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -92,7 +92,7 @@ export default function ProductDetailPage({ params }) {
           review_text: reviewText
         })
       })
-      
+
       if (res.ok) {
         toast.success('Review submitted successfully!')
         setRating(0)
@@ -121,10 +121,10 @@ export default function ProductDetailPage({ params }) {
       // First, check if item already exists in cart
       const checkRes = await fetch(`/api/cart?user_id=${user.id}`)
       const checkData = await checkRes.json()
-      
+
       if (checkRes.ok && checkData.data) {
         const existingItem = checkData.data.find(item => item.product_id === product.id)
-        
+
         if (existingItem) {
           // Item already in cart, show warning
           toast.warning('This item is already in your cart!', {
@@ -140,7 +140,7 @@ export default function ProductDetailPage({ params }) {
       }
 
       // Item not in cart, proceed to add
-      const res = await fetch('/api/cart', {
+      const res = await fetch(`/api/cart`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -173,7 +173,7 @@ export default function ProductDetailPage({ params }) {
     }
 
     try {
-      const res = await fetch('/api/wishlist', {
+      const res = await fetch(`/api/wishlist`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -235,7 +235,7 @@ export default function ProductDetailPage({ params }) {
                       className="w-full h-[500px] object-cover"
                     />
                   </div>
-                  
+
                   {/* Carousel Controls - Only show if multiple images */}
                   {product.image_url.split(',').length > 1 && (
                     <>
@@ -245,37 +245,36 @@ export default function ProductDetailPage({ params }) {
                         variant="ghost"
                         size="icon"
                         className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white border-2 h-12 w-12 rounded-full shadow-lg"
-                        onClick={() => setCurrentImageIndex(prev => 
+                        onClick={() => setCurrentImageIndex(prev =>
                           prev === 0 ? product.image_url.split(',').length - 1 : prev - 1
                         )}
                       >
                         <ArrowLeft className="h-6 w-6" />
                       </Button>
-                      
+
                       {/* Next Button */}
                       <Button
                         id="next-image-btn"
                         variant="ghost"
                         size="icon"
                         className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white border-2 h-12 w-12 rounded-full shadow-lg"
-                        onClick={() => setCurrentImageIndex(prev => 
+                        onClick={() => setCurrentImageIndex(prev =>
                           prev === product.image_url.split(',').length - 1 ? 0 : prev + 1
                         )}
                       >
                         <ArrowLeft className="h-6 w-6 rotate-180" />
                       </Button>
-                      
+
                       {/* Image Indicators */}
                       <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
                         {product.image_url.split(',').map((_, index) => (
                           <button
                             key={index}
                             id={`image-indicator-${index}`}
-                            className={`h-2 rounded-full transition-all ${
-                              index === currentImageIndex 
-                                ? 'w-8 bg-black' 
-                                : 'w-2 bg-white/70 hover:bg-white'
-                            }`}
+                            className={`h-2 rounded-full transition-all ${index === currentImageIndex
+                              ? 'w-8 bg-black'
+                              : 'w-2 bg-white/70 hover:bg-white'
+                              }`}
                             onClick={() => setCurrentImageIndex(index)}
                           />
                         ))}
@@ -298,7 +297,7 @@ export default function ProductDetailPage({ params }) {
               <h1 id="product-title" className="text-4xl font-bold text-black mb-4">{product.name}</h1>
               <div className="flex items-center gap-2 mb-4">
                 <div className="flex">
-                  {[1,2,3,4,5].map(star => (
+                  {[1, 2, 3, 4, 5].map(star => (
                     <Star key={star} className="h-5 w-5 fill-yellow-400 text-yellow-400" />
                   ))}
                 </div>
@@ -357,17 +356,17 @@ export default function ProductDetailPage({ params }) {
 
                   {/* Action Buttons */}
                   <div className="space-y-3">
-                    <Button 
+                    <Button
                       id="add-to-cart-btn"
-                      onClick={addToCart} 
+                      onClick={addToCart}
                       disabled={addingToCart}
-                      className="w-full bg-black text-white hover:bg-gray-800" 
+                      className="w-full bg-black text-white hover:bg-gray-800"
                       size="lg"
                     >
                       <ShoppingCart className="h-5 w-5 mr-2" />
                       {addingToCart ? 'Adding...' : 'Add to Cart'}
                     </Button>
-                    <Button 
+                    <Button
                       id="add-to-wishlist-btn"
                       onClick={addToWishlist}
                       variant="outline"
@@ -393,7 +392,7 @@ export default function ProductDetailPage({ params }) {
                 <TabsTrigger id="tab-description" value="description">Description</TabsTrigger>
                 <TabsTrigger id="tab-reviews" value="reviews">Reviews</TabsTrigger>
               </TabsList>
-              
+
               <TabsContent value="specifications" className="mt-6">
                 <div className="space-y-4">
                   <h3 className="text-2xl font-bold mb-4">Product Specifications</h3>
@@ -435,7 +434,7 @@ export default function ProductDetailPage({ params }) {
                   </table>
                 </div>
               </TabsContent>
-              
+
               <TabsContent value="description" className="mt-6">
                 <div className="space-y-4">
                   <h3 className="text-2xl font-bold mb-4">Product Description</h3>
@@ -452,11 +451,11 @@ export default function ProductDetailPage({ params }) {
                   </div>
                 </div>
               </TabsContent>
-              
+
               <TabsContent value="reviews" className="mt-6">
                 <div className="space-y-4">
                   <h3 id="reviews-heading" className="text-2xl font-bold mb-4">Customer Reviews</h3>
-                  
+
                   {/* Add Review Form */}
                   <Card id="add-review-card" className="add-review-section border-2 bg-gray-50">
                     <CardContent className="pt-6">
@@ -465,10 +464,10 @@ export default function ProductDetailPage({ params }) {
                         <div>
                           <Label htmlFor="review-rating">Rating</Label>
                           <div className="flex gap-2">
-                            {[1,2,3,4,5].map(star => (
-                              <Star 
-                                key={star} 
-                                id={`star-${star}`} 
+                            {[1, 2, 3, 4, 5].map(star => (
+                              <Star
+                                key={star}
+                                id={`star-${star}`}
                                 className={`star-rating h-6 w-6 cursor-pointer ${rating >= star ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'}`}
                                 onClick={() => setRating(star)}
                               />
@@ -486,8 +485,8 @@ export default function ProductDetailPage({ params }) {
                             onChange={(e) => setReviewText(e.target.value)}
                           />
                         </div>
-                        <Button 
-                          id="submit-review-btn" 
+                        <Button
+                          id="submit-review-btn"
                           className="submit-review-button bg-black text-white hover:bg-gray-800"
                           onClick={submitReview}
                           disabled={submittingReview}

@@ -47,7 +47,7 @@ export default function SavedCardsPage() {
       toast.error('Card number must be 16 digits')
       return false
     }
-    
+
     // Luhn algorithm
     let sum = 0, isEven = false
     for (let i = cleanNumber.length - 1; i >= 0; i--) {
@@ -63,7 +63,7 @@ export default function SavedCardsPage() {
       toast.error('Invalid card number')
       return false
     }
-    
+
     if (!cardHolder.trim()) {
       toast.error('Card holder name required')
       return false
@@ -81,10 +81,10 @@ export default function SavedCardsPage() {
 
   const handleSaveCard = async () => {
     if (!validateCard()) return
-    
+
     setSaving(true)
     try {
-      const res = await fetch('/api/saved-cards', {
+      const res = await fetch(`/api/saved-cards`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -95,7 +95,7 @@ export default function SavedCardsPage() {
           expiry_date: expiryDate
         })
       })
-      
+
       if (res.ok) {
         toast.success('Card saved successfully!')
         setShowAddForm(false)
@@ -146,7 +146,7 @@ export default function SavedCardsPage() {
             Add New Card
           </Button>
         </div>
-        
+
         <div className="max-w-3xl mx-auto space-y-4">
           {/* Add Card Form */}
           {showAddForm && (
@@ -202,7 +202,7 @@ export default function SavedCardsPage() {
                       value={expiryDate}
                       onChange={(e) => {
                         const val = e.target.value.replace(/\D/g, '')
-                        setExpiryDate(val.length >= 2 ? val.substring(0,2) + '/' + val.substring(2,4) : val)
+                        setExpiryDate(val.length >= 2 ? val.substring(0, 2) + '/' + val.substring(2, 4) : val)
                       }}
                       maxLength={5}
                       className="border-2"
@@ -247,10 +247,10 @@ export default function SavedCardsPage() {
                       <p className="text-xs text-gray-400">Expires: {card.expiry_month}/{card.expiry_year}</p>
                     </div>
                   </div>
-                  <Button 
+                  <Button
                     id={`delete-card-${idx}`}
                     onClick={() => handleDeleteCard(card.id)}
-                    variant="ghost" 
+                    variant="ghost"
                     className="text-gray-400 hover:text-red-600"
                   >
                     <Trash2 className="h-5 w-5" />

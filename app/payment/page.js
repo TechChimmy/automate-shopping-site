@@ -12,6 +12,7 @@ import { CreditCard, ShoppingBag, CheckCircle } from 'lucide-react'
 import { toast } from 'sonner'
 import Link from 'next/link'
 
+
 export default function PaymentPage() {
   const [cartItems, setCartItems] = useState([])
   const [loading, setLoading] = useState(true)
@@ -25,7 +26,7 @@ export default function PaymentPage() {
   const [cardHolder, setCardHolder] = useState('')
   const [expiryDate, setExpiryDate] = useState('')
   const [cvv, setCvv] = useState('')
-  
+
   // Shipping address state
   const [address, setAddress] = useState('')
   const [city, setCity] = useState('')
@@ -44,7 +45,7 @@ export default function PaymentPage() {
     try {
       const res = await fetch(`/api/cart?user_id=${user.id}`)
       const data = await res.json()
-      
+
       if (data.data) {
         const itemsWithProducts = await Promise.all(
           data.data.map(async (item) => {
@@ -72,7 +73,7 @@ export default function PaymentPage() {
       return sum + (parseFloat(item.product?.price || 0) * item.quantity)
     }, 0).toFixed(2)
   }
-  
+
   const calculateShipping = (pin) => {
     if (!pin || pin.length !== 6) return 0
     // Calculate shipping based on pincode
@@ -81,7 +82,7 @@ export default function PaymentPage() {
     if (firstDigit <= 6) return 80 // Tier 2 cities
     return 120 // Remote areas
   }
-  
+
   const handlePincodeChange = (value) => {
     setPincode(value)
     if (value.length === 6) {
@@ -95,17 +96,17 @@ export default function PaymentPage() {
 
   const validateCard = () => {
     const cleanNumber = cardNumber.replace(/\s/g, '')
-    
+
     // Card number validation
     if (!cardNumber || cleanNumber.length !== 16) {
       toast.error('Please enter a valid 16-digit card number')
       return false
     }
-    
+
     // Card type validation based on first digits
     const firstDigit = cleanNumber[0]
     const firstTwo = cleanNumber.substring(0, 2)
-    
+
     if (cardType === 'visa' && firstDigit !== '4') {
       toast.error('Visa cards must start with 4. Please check your card number or select correct card type.')
       return false
@@ -118,7 +119,7 @@ export default function PaymentPage() {
       toast.error('RuPay cards must start with 6. Please check your card number or select correct card type.')
       return false
     }
-    
+
     // Luhn algorithm check for card number
     let sum = 0
     let isEven = false
@@ -135,7 +136,7 @@ export default function PaymentPage() {
       toast.error('Invalid card number. Please check and try again.')
       return false
     }
-    
+
     if (!cardHolder || cardHolder.trim().length < 3) {
       toast.error('Please enter card holder name')
       return false
@@ -144,7 +145,7 @@ export default function PaymentPage() {
       toast.error('Please enter expiry date in MM/YY format')
       return false
     }
-    
+
     // Check if card is expired
     const [month, year] = expiryDate.split('/').map(Number)
     const now = new Date()
@@ -153,7 +154,7 @@ export default function PaymentPage() {
       toast.error('Card has expired')
       return false
     }
-    
+
     if (!cvv || cvv.length !== 3) {
       toast.error('Please enter a valid 3-digit CVV')
       return false
@@ -166,12 +167,12 @@ export default function PaymentPage() {
       toast.error('Your cart is empty')
       return
     }
-    
+
     if (!address || !city || !pincode) {
       toast.error('Please fill in complete shipping address')
       return
     }
-    
+
     if (pincode.length !== 6) {
       toast.error('Please enter valid 6-digit pincode')
       return
@@ -204,7 +205,8 @@ export default function PaymentPage() {
         shipping_address: `${address}, ${city}, ${pincode}`
       }
 
-      const res = await fetch('/api/orders', {
+
+      const res = await fetch(`/api/orders`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(orderData)
@@ -312,7 +314,7 @@ export default function PaymentPage() {
                 )}
               </CardContent>
             </Card>
-            
+
             <Card id="payment-method-card" className="border-2">
               <CardHeader>
                 <CardTitle>Payment Method</CardTitle>
@@ -462,11 +464,11 @@ export default function PaymentPage() {
                   <span>Total</span>
                   <span id="order-total">₹{(parseFloat(calculateTotal()) + shippingCost).toFixed(2)}</span>
                 </div>
-                <Button 
+                <Button
                   id="place-order-btn"
                   onClick={handlePlaceOrder}
                   disabled={processing || cartItems.length === 0}
-                  className="w-full bg-black text-white hover:bg-gray-800" 
+                  className="w-full bg-black text-white hover:bg-gray-800"
                   size="lg"
                 >
                   {processing ? (

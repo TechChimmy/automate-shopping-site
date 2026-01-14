@@ -46,7 +46,7 @@ export default function RegisterPage() {
 
     try {
       // Call API route to register user
-      const response = await fetch('/api/auth/register', {
+      const response = await fetch(`/api/auth/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -54,14 +54,21 @@ export default function RegisterPage() {
         body: JSON.stringify({ name, email, phone, password }),
       })
 
-      const data = await response.json()
+      const contentType = response.headers.get('content-type')
+      let data
+      if (contentType && contentType.includes('application/json')) {
+        data = await response.json()
+      } else {
+        const text = await response.text()
+        if (!response.ok) throw new Error(text || 'Server error')
+      }
 
       if (!response.ok) {
-        throw new Error(data.error || 'Registration failed')
+        throw new Error(data?.error || 'Registration failed')
       }
 
       toast.success('Account created successfully! Please login.')
-      
+
       // Redirect to login page
       router.push('/auth/login')
     } catch (error) {

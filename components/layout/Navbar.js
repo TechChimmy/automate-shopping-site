@@ -31,12 +31,12 @@ export default function Navbar() {
         fetch(`/api/cart?user_id=${user.id}`),
         fetch(`/api/wishlist?user_id=${user.id}`)
       ])
-      
+
       if (cartRes.ok) {
         const cartData = await cartRes.json()
         setCartCount(cartData.data?.length || 0)
       }
-      
+
       if (wishlistRes.ok) {
         const wishlistData = await wishlistRes.json()
         setWishlistCount(wishlistData.data?.length || 0)
@@ -113,7 +113,7 @@ export default function Navbar() {
                         Products
                       </Button>
                     </Link>
-                    
+
                     <Link href="/wishlist">
                       <Button id="wishlist-btn" variant="ghost" size="icon" className="text-white hover:bg-gray-800 relative">
                         <Heart className="h-5 w-5" />
@@ -124,7 +124,7 @@ export default function Navbar() {
                         )}
                       </Button>
                     </Link>
-                    
+
                     <Link href="/cart">
                       <Button id="cart-btn" variant="ghost" size="icon" className="text-white hover:bg-gray-800 relative">
                         <ShoppingCart className="h-5 w-5" />
@@ -135,14 +135,14 @@ export default function Navbar() {
                         )}
                       </Button>
                     </Link>
-                    
+
                     <Link href="/dashboard">
                       <Button id="account-btn" variant="ghost" className="text-white hover:bg-gray-800">
                         <User className="h-5 w-5 mr-2" />
                         Account
                       </Button>
                     </Link>
-                    
+
                     <Link href="/account/cards">
                       <Button id="cards-link" variant="ghost" className="text-white hover:bg-gray-800">
                         Cards

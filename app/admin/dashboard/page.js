@@ -87,7 +87,7 @@ export default function AdminDashboard() {
             supabase.from('products').select('name').eq('id', order.product_id).single(),
             supabase.from('users').select('email').eq('id', order.user_id).single()
           ])
-          
+
           return {
             ...order,
             products: productResult.data,
@@ -105,23 +105,23 @@ export default function AdminDashboard() {
   const fetchUsers = async () => {
     try {
       // Get user count
-      const countResponse = await fetch('/api/users/count')
+      const countResponse = await fetch(`/api/users/count`)
       const countData = await countResponse.json()
-      
+
       if (countResponse.ok && countData.count !== undefined) {
         setTotalUsersCount(countData.count)
       }
-      
+
       // Fetch users from API endpoint (uses service role key to bypass RLS)
-      const usersResponse = await fetch('/api/users')
+      const usersResponse = await fetch(`/api/users`)
       const usersData = await usersResponse.json()
-      
+
       if (!usersResponse.ok) {
         throw new Error(usersData.error || 'Failed to fetch users')
       }
-      
+
       console.log('Fetched users data:', usersData.data)
-      
+
       // Filter out admin emails and sort by name
       const filteredUsers = (usersData.data || [])
         .filter(user => !user.email.startsWith('admin@'))
@@ -130,7 +130,7 @@ export default function AdminDashboard() {
           const nameB = (b.name || b.email || '').toLowerCase()
           return nameA.localeCompare(nameB)
         })
-      
+
       console.log('Filtered users:', filteredUsers)
       setUsers(filteredUsers)
     } catch (error) {
@@ -232,7 +232,7 @@ export default function AdminDashboard() {
       image_url: product.image_url || ''
     })
     setImageFile(null)
-    
+
     // Check if image_url contains multiple URLs
     if (product.image_url && product.image_url.includes(',')) {
       setImageUrls(product.image_url.split(',').map(url => url.trim()))
@@ -244,7 +244,7 @@ export default function AdminDashboard() {
       setImageUrls([''])
       setUseUrlInput(false)
     }
-    
+
     setDialogOpen(true)
   }
 
@@ -451,7 +451,7 @@ export default function AdminDashboard() {
                                 />
                               </div>
                             </div>
-                            
+
                             {useUrlInput ? (
                               <div className="space-y-2">
                                 {imageUrls.map((url, index) => (

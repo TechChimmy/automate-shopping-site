@@ -21,32 +21,57 @@ export default function WishlistPage() {
     } else if (user) {
       fetchWishlist()
     }
-  }, [user, userLoading, router])
+  }, [user, userLoading])
 
   const fetchWishlist = async () => {
+    setLoading(true)
+
     try {
-      const res = await fetch(`/api/wishlist?user_id=${user.id}`)
-      const data = await res.json()
-      
-      if (data.data) {
-        // Fetch product details for each wishlist item
-        const itemsWithProducts = await Promise.all(
-          data.data.map(async (item) => {
-            const productRes = await fetch(`https://qttglmtiagzuxpttjsoy.supabase.co/rest/v1/products?id=eq.${item.product_id}`, {
-              headers: {
-                'apikey': process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-                'Authorization': `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`
-              }
-            })
-            const products = await productRes.json()
-            return { ...item, product: products[0] }
-          })
-        )
-        setWishlistItems(itemsWithProducts)
+      const res = await fetch(`/api/wishlist?user_id=${user.id}`, {
+        credentials: 'include',
+      })
+
+      if (!res.ok) {
+        throw new Error('Failed to fetch wishlist')
       }
+
+      const data = await res.json()
+
+      if (!data?.data) {
+        setWishlistItems([])
+        return
+      }
+
+      const itemsWithProducts = await Promise.all(
+        data.data.map(async (item) => {
+          try {
+            const productRes = await fetch(
+              `https://qttglmtiagzuxpttjsoy.supabase.co/rest/v1/products?id=eq.${item.product_id}`,
+              {
+                headers: {
+                  apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+                  Authorization: `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
+                },
+              }
+            )
+
+            const products = await productRes.json()
+
+            return {
+              ...item,
+              product: products?.[0] ?? null,
+            }
+          } catch {
+            return { ...item, product: null }
+          }
+        })
+      )
+
+      setWishlistItems(itemsWithProducts)
     } catch (error) {
-      console.error('Error fetching wishlist:', error)
+      console.error('Wishlist fetch error:', error)
       toast.error('Failed to load wishlist')
+      setWishlistItems([])
     } finally {
       setLoading(false)
     }
@@ -55,47 +80,59 @@ export default function WishlistPage() {
   const removeItem = async (wishlistId) => {
     try {
       const res = await fetch(`/api/wishlist?id=${wishlistId}`, {
-        method: 'DELETE'
+        method: 'DELETE',
+        credentials: 'include',
       })
 
-      if (res.ok) {
-        fetchWishlist()
-        toast.success('Removed from wishlist')
+      if (!res.ok) {
+        throw new Error('Remove failed')
       }
+
+      fetchWishlist()
+      toast.success('Removed from wishlist')
     } catch (error) {
-      console.error('Error removing item:', error)
+      console.error(error)
       toast.error('Failed to remove item')
     }
   }
 
   const moveToCart = async (item) => {
     try {
-      // Add to cart
-      const res = await fetch('/api/cart', {
+      const cartRes = await fetch(`/api/cart`, {
         method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          user_id: user.id,
           product_id: item.product_id,
-          quantity: 1
-        })
+          quantity: 1,
+        }),
       })
 
-      if (res.ok) {
-        // Remove from wishlist
-        await removeItem(item.id)
-        toast.success('Moved to cart!')
+      if (!cartRes.ok) {
+        throw new Error('Add to cart failed')
       }
+
+      const removeRes = await fetch(`/api/wishlist?id=${item.id}`, {
+        method: 'DELETE',
+        credentials: 'include',
+      })
+
+      if (!removeRes.ok) {
+        throw new Error('Wishlist cleanup failed')
+      }
+
+      fetchWishlist()
+      toast.success('Moved to cart!')
     } catch (error) {
-      console.error('Error moving to cart:', error)
-      toast.error('Failed to move to cart')
+      console.error(error)
+      toast.error('Failed to move item to cart')
     }
   }
 
   if (userLoading || loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black" />
       </div>
     )
   }
@@ -121,9 +158,8 @@ export default function WishlistPage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {wishlistItems.map((item, index) => (
-              <Card key={item.id} className="border-2 hover:border-black transition-colors group">
+              <Card key={item.id} className="border-2 hover:border-black transition-colors">
                 <CardContent className="p-0">
-                  {/* Product Image */}
                   <div className="relative h-64 bg-gray-100">
                     {item.product?.image_url ? (
                       <img
@@ -136,11 +172,9 @@ export default function WishlistPage() {
                         <ShoppingCart className="h-16 w-16 text-gray-400" />
                       </div>
                     )}
-                    
-                    {/* Remove Button */}
+
                     <Button
-                      id={`remove-wishlist-btn-${index}`}
-                      className="remove-wishlist-button absolute top-2 right-2 bg-white hover:bg-red-50 hover:text-red-600 shadow-lg"
+                      className="absolute top-2 right-2 bg-white hover:bg-red-50 hover:text-red-600 shadow"
                       variant="ghost"
                       size="icon"
                       onClick={() => removeItem(item.id)}
@@ -149,12 +183,17 @@ export default function WishlistPage() {
                     </Button>
                   </div>
 
-                  {/* Product Details */}
                   <div className="p-4">
-                    <h3 className="font-bold text-lg mb-2 line-clamp-2">{item.product?.name}</h3>
-                    <p className="text-sm text-gray-600 mb-3">{item.product?.category}</p>
-                    <p className="text-2xl font-bold mb-4">₹{parseFloat(item.product?.price || 0).toFixed(2)}</p>
-                    
+                    <h3 className="font-bold text-lg mb-2 line-clamp-2">
+                      {item.product?.name}
+                    </h3>
+                    <p className="text-sm text-gray-600 mb-3">
+                      {item.product?.category}
+                    </p>
+                    <p className="text-2xl font-bold mb-4">
+                      ₹{parseFloat(item.product?.price || 0).toFixed(2)}
+                    </p>
+
                     <div className="flex gap-2">
                       <Button
                         onClick={() => moveToCart(item)}

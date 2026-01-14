@@ -25,9 +25,18 @@ export default function CartPage() {
 
   const fetchCart = async () => {
     try {
-      const res = await fetch(`/api/cart?user_id=${user.id}`)
+      const res = await fetch(`/api/cart?user_id=${user.id}`, {
+        credentials: 'include',
+      })
+
+      const contentType = res.headers.get('content-type')
+      if (!res.ok) {
+        const text = await res.text()
+        throw new Error(text || `Server error: ${res.status}`)
+      }
+
       const data = await res.json()
-      
+
       if (data.data) {
         // Fetch product details for each cart item
         const itemsWithProducts = await Promise.all(
@@ -54,20 +63,27 @@ export default function CartPage() {
 
   const updateQuantity = async (cartId, newQuantity) => {
     if (newQuantity < 1) return
-    
+
     try {
-      const res = await fetch('/api/cart', {
+      const res = await fetch(`/api/cart`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: cartId, quantity: newQuantity })
+        body: JSON.stringify({ id: cartId, quantity: newQuantity }),
+        credentials: 'include',
       })
 
       if (res.ok) {
         fetchCart()
         toast.success('Cart updated')
       } else {
-        const errorData = await res.json()
-        toast.error(errorData.error || 'Failed to update cart')
+        const contentType = res.headers.get('content-type')
+        if (contentType && contentType.includes('application/json')) {
+          const errorData = await res.json()
+          toast.error(errorData.error || 'Failed to update cart')
+        } else {
+          const text = await res.text()
+          throw new Error(text || `Server error: ${res.status}`)
+        }
       }
     } catch (error) {
       console.error('Error updating cart:', error)
@@ -78,7 +94,8 @@ export default function CartPage() {
   const removeItem = async (cartId) => {
     try {
       const res = await fetch(`/api/cart?id=${cartId}`, {
-        method: 'DELETE'
+        method: 'DELETE',
+        credentials: 'include',
       })
 
       if (res.ok) {
