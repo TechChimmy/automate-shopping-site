@@ -65,7 +65,8 @@ export default function AccountPage() {
       return
     }
 
-    if (!formData.phone.trim()) {
+    // if (!formData.phone.trim()) {
+    if (!(String(formData.phone).trim())) {
       toast.error('Phone number is required')
       return
     }

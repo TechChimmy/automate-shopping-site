@@ -12,6 +12,7 @@ import { CreditCard, ShoppingBag, CheckCircle } from 'lucide-react'
 import { toast } from 'sonner'
 import Link from 'next/link'
 
+
 export default function PaymentPage() {
   const [cartItems, setCartItems] = useState([])
   const [loading, setLoading] = useState(true)
@@ -42,8 +43,7 @@ export default function PaymentPage() {
 
   const fetchCart = async () => {
     try {
-      const { API_BASE } = await import('@/lib/constants')
-      const res = await fetch(`${API_BASE}/cart?user_id=${user.id}`)
+      const res = await fetch(`/api/cart?user_id=${user.id}`)
       const data = await res.json()
 
       if (data.data) {
@@ -205,8 +205,8 @@ export default function PaymentPage() {
         shipping_address: `${address}, ${city}, ${pincode}`
       }
 
-      const { API_BASE } = await import('@/lib/constants')
-      const res = await fetch(`${API_BASE}/orders`, {
+
+      const res = await fetch(`/api/orders`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(orderData)
