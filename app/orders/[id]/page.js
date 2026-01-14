@@ -27,11 +27,11 @@ export default function OrderSummaryPage({ params }) {
       // Fetch this specific order with product details
       const orderRes = await fetch(`/api/orders?id=${params.id}`)
       const orderData = await orderRes.json()
-      
+
       if (!orderData.data || orderData.data.length === 0) {
         throw new Error('Order not found')
       }
-      
+
       const currentOrder = orderData.data[0]
       setOrder(currentOrder)
 

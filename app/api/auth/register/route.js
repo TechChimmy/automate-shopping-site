@@ -17,6 +17,8 @@ export async function POST(request) {
   try {
     const { name, email, phone, password } = await request.json()
 
+    console.log('Received data:', { name, email, phone, password })
+
     // Validate input
     if (!name || !email || !phone || !password) {
       return NextResponse.json(
@@ -55,7 +57,7 @@ export async function POST(request) {
           id: authData.user.id,
           email: authData.user.email,
           name: name,
-          phone: phone,
+          phone: parseInt(phone),
           role: 'user',
         }
       ])

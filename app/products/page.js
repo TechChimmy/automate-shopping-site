@@ -16,7 +16,7 @@ import { useUser } from '@/hooks/use-user'
 function ProductsContent() {
   const searchParams = useSearchParams()
   const searchQuery = searchParams.get('search') || ''
-  
+
   const [products, setProducts] = useState([])
   const [filteredProducts, setFilteredProducts] = useState([])
   const [loading, setLoading] = useState(true)
@@ -51,13 +51,13 @@ function ProductsContent() {
         .order('created_at', { ascending: false })
 
       if (error) throw error
-      
+
       setProducts(data || [])
-      
+
       // Extract unique categories
       const uniqueCategories = [...new Set(data.map(p => p.category))]
       setCategories(uniqueCategories)
-      
+
       // Set max price range
       const maxPrice = Math.max(...data.map(p => parseFloat(p.price)), 1000)
       setPriceRange([0, maxPrice])
@@ -114,10 +114,10 @@ function ProductsContent() {
       // First, check if item already exists in cart
       const checkRes = await fetch(`/api/cart?user_id=${user.id}`)
       const checkData = await checkRes.json()
-      
+
       if (checkRes.ok && checkData.data) {
         const existingItem = checkData.data.find(item => item.product_id === productId)
-        
+
         if (existingItem) {
           // Item already in cart, show warning
           toast.warning('This item is already in your cart!', {
@@ -128,7 +128,7 @@ function ProductsContent() {
       }
 
       // Item not in cart, proceed to add
-      const res = await fetch('/api/cart', {
+      const res = await fetch(`/api/cart`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -159,7 +159,7 @@ function ProductsContent() {
     }
 
     try {
-      const res = await fetch('/api/wishlist', {
+      const res = await fetch(`/api/wishlist`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -232,7 +232,7 @@ function ProductsContent() {
               </Select>
 
               {/* Clear Filters Button */}
-              <Button 
+              <Button
                 id="clear-filters-btn"
                 className="clear-filters-button bg-gray-200 text-black hover:bg-gray-300"
                 onClick={() => {
@@ -271,8 +271,8 @@ function ProductsContent() {
               <div className="mt-4">
                 <p className="text-sm text-gray-600">
                   Showing results for: <span className="font-semibold">"{searchTerm}"</span>
-                  <Button 
-                    variant="link" 
+                  <Button
+                    variant="link"
                     onClick={() => setSearchTerm('')}
                     className="ml-2 text-black"
                   >
@@ -289,7 +289,7 @@ function ProductsContent() {
           <div id="no-products" className="text-center py-16">
             <p className="text-gray-500 text-lg">No products found.</p>
             {searchTerm && (
-              <Button 
+              <Button
                 onClick={() => setSearchTerm('')}
                 className="mt-4 bg-black text-white hover:bg-gray-800"
               >
@@ -303,56 +303,56 @@ function ProductsContent() {
               {filteredProducts
                 .slice((currentPage - 1) * productsPerPage, currentPage * productsPerPage)
                 .map((product, index) => (
-                <Card key={product.id} id={`product-card-${index}`} className="border-2 hover:border-black transition-all group">
-                  <div className="relative">
-                    {product.image_url ? (
-                      <img
-                        src={product.image_url.split(',')[0]}
-                        alt={product.name}
-                        className="w-full h-64 object-cover"
-                      />
-                    ) : (
-                      <div className="w-full h-64 bg-gray-200 flex items-center justify-center">
-                        <ShoppingCart className="h-16 w-16 text-gray-400" />
-                      </div>
-                    )}
-                    
-                    {/* Wishlist Button */}
-                    <Button
-                      id={`wishlist-btn-${index}`}
-                      onClick={() => addToWishlist(product.id)}
-                      variant="ghost"
-                      size="icon"
-                      className="absolute top-2 right-2 bg-white hover:bg-gray-100 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
-                    >
-                      <Heart className="h-5 w-5" />
-                    </Button>
-                  </div>
-                  
-                  <CardContent className="pt-4">
-                    <Badge id={`product-category-${index}`} className="product-category-badge mb-2 bg-black text-white">{product.category}</Badge>
-                    <h3 id={`product-title-${index}`} className="product-title font-bold text-lg mb-2 line-clamp-2">{product.name}</h3>
-                    <p id={`product-description-${index}`} className="product-description text-sm text-gray-600 mb-3 line-clamp-2">{product.description}</p>
-                    <p id={`product-price-${index}`} className="product-price text-2xl font-bold">₹{parseFloat(product.price).toFixed(2)}</p>
-                  </CardContent>
-                  
-                  <CardFooter className="flex gap-2">
-                    <Button
-                      id={`add-cart-btn-${index}`}
-                      onClick={() => addToCart(product.id)}
-                      className="flex-1 bg-black text-white hover:bg-gray-800"
-                    >
-                      <ShoppingCart className="h-4 w-4 mr-2" />
-                      Add to Cart
-                    </Button>
-                    <Link href={`/products/${product.id}`} target="_blank" rel="noopener noreferrer" className="flex-1">
-                      <Button id={`view-btn-${index}`} variant="outline" className="w-full border-2">
-                        View
+                  <Card key={product.id} id={`product-card-${index}`} className="border-2 hover:border-black transition-all group">
+                    <div className="relative">
+                      {product.image_url ? (
+                        <img
+                          src={product.image_url.split(',')[0]}
+                          alt={product.name}
+                          className="w-full h-64 object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-64 bg-gray-200 flex items-center justify-center">
+                          <ShoppingCart className="h-16 w-16 text-gray-400" />
+                        </div>
+                      )}
+
+                      {/* Wishlist Button */}
+                      <Button
+                        id={`wishlist-btn-${index}`}
+                        onClick={() => addToWishlist(product.id)}
+                        variant="ghost"
+                        size="icon"
+                        className="absolute top-2 right-2 bg-white hover:bg-gray-100 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        <Heart className="h-5 w-5" />
                       </Button>
-                    </Link>
-                  </CardFooter>
-                </Card>
-              ))}
+                    </div>
+
+                    <CardContent className="pt-4">
+                      <Badge id={`product-category-${index}`} className="product-category-badge mb-2 bg-black text-white">{product.category}</Badge>
+                      <h3 id={`product-title-${index}`} className="product-title font-bold text-lg mb-2 line-clamp-2">{product.name}</h3>
+                      <p id={`product-description-${index}`} className="product-description text-sm text-gray-600 mb-3 line-clamp-2">{product.description}</p>
+                      <p id={`product-price-${index}`} className="product-price text-2xl font-bold">₹{parseFloat(product.price).toFixed(2)}</p>
+                    </CardContent>
+
+                    <CardFooter className="flex gap-2">
+                      <Button
+                        id={`add-cart-btn-${index}`}
+                        onClick={() => addToCart(product.id)}
+                        className="flex-1 bg-black text-white hover:bg-gray-800"
+                      >
+                        <ShoppingCart className="h-4 w-4 mr-2" />
+                        Add to Cart
+                      </Button>
+                      <Link href={`/products/${product.id}`} target="_blank" rel="noopener noreferrer" className="flex-1">
+                        <Button id={`view-btn-${index}`} variant="outline" className="w-full border-2">
+                          View
+                        </Button>
+                      </Link>
+                    </CardFooter>
+                  </Card>
+                ))}
             </div>
 
             {/* Pagination */}
@@ -370,7 +370,7 @@ function ProductsContent() {
                 >
                   Previous
                 </Button>
-                
+
                 <div className="flex gap-2">
                   {Array.from({ length: Math.ceil(filteredProducts.length / productsPerPage) }, (_, i) => i + 1).map(pageNum => (
                     <Button

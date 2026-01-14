@@ -32,7 +32,7 @@ export async function OPTIONS() {
 // Route handler function
 async function handleRoute(request, { params }) {
   const { path = [] } = params
-  const route = `/${path.join('/')}`
+  const route = `/${path.join('/retail')}`
   const method = request.method
 
   try {
@@ -50,10 +50,10 @@ async function handleRoute(request, { params }) {
     // Status endpoints - POST /api/status
     if (route === '/status' && method === 'POST') {
       const body = await request.json()
-      
+
       if (!body.client_name) {
         return handleCORS(NextResponse.json(
-          { error: "client_name is required" }, 
+          { error: "client_name is required" },
           { status: 400 }
         ))
       }
@@ -77,20 +77,20 @@ async function handleRoute(request, { params }) {
 
       // Remove MongoDB's _id field from response
       const cleanedStatusChecks = statusChecks.map(({ _id, ...rest }) => rest)
-      
+
       return handleCORS(NextResponse.json(cleanedStatusChecks))
     }
 
     // Route not found
     return handleCORS(NextResponse.json(
-      { error: `Route ${route} not found` }, 
+      { error: `Route ${route} not found` },
       { status: 404 }
     ))
 
   } catch (error) {
     console.error('API Error:', error)
     return handleCORS(NextResponse.json(
-      { error: "Internal server error" }, 
+      { error: "Internal server error" },
       { status: 500 }
     ))
   }

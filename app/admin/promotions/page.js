@@ -43,7 +43,7 @@ export default function PromotionsPage() {
 
   const fetchPromotions = async () => {
     try {
-      const res = await fetch('/api/promotions')
+      const res = await fetch(`/api/promotions`)
       const data = await res.json()
       setPromotions(data.data || [])
     } catch (error) {
@@ -60,7 +60,7 @@ export default function PromotionsPage() {
       const method = editingPromo ? 'PUT' : 'POST'
       const body = editingPromo ? { ...formData, id: editingPromo.id } : formData
 
-      const res = await fetch('/api/promotions', {
+      const res = await fetch(`/api/promotions`, {
         method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body)
@@ -270,9 +270,8 @@ export default function PromotionsPage() {
                             {promo.code}
                           </span>
                         )}
-                        <span className={`px-3 py-1 rounded text-sm font-semibold ${
-                          promo.active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-                        }`}>
+                        <span className={`px-3 py-1 rounded text-sm font-semibold ${promo.active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                          }`}>
                           {promo.active ? 'Active' : 'Inactive'}
                         </span>
                       </div>
